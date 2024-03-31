@@ -20,6 +20,7 @@ export interface ISpending extends IWithTags{
 }
 
 export interface ITodo  extends IWithTags{
+	declined: boolean;
 	finished: boolean;
 	text: string;
 }
