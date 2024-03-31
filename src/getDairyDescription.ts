@@ -1,0 +1,89 @@
+import chalk from "chalk";
+import { ISpending, ITopic, ITodo, ITag, TagType } from "./types";
+import { getUniqueTags } from "./utils"
+
+interface IDairy {
+	filename: string;
+	topics: ITopic[];
+}
+
+const TagNames: Record<TagType, string> = {
+	[TagType.Contact]:  "Contact",
+	[TagType.Place]:  "Location",
+	[TagType.General]:  "Other",
+}
+
+interface ILineProps {
+	content: chalk.Chalk;
+	isNextLine: boolean;
+	prefix?: string;
+	title: chalk.Chalk;
+}
+
+const PREFIX =  '\t';
+const NEXT_LINE = '\n';
+const LINE_SEPARATOR = '-------------------\n';
+
+const getLine = (title: string, content: string, props?: Partial<ILineProps>) => {
+	const defaultRender = (...text: unknown[]) => text.join();
+	const contentRender = props?.content || defaultRender;
+	const titleRender  = props?.title || chalk.bold;
+	const isNextLine = props?.isNextLine || false;
+	const prefix = props?.prefix || "";
+
+	return `${prefix}${titleRender(title)}: ${isNextLine? NEXT_LINE: ""}${contentRender(content)}`;
+}
+
+
+const getJoinedTags = (tags: ITag[]) => {
+	const descending = (a: ITag, b: ITag) => b.count - a.count;
+	return [...tags].sort(descending).map(item => chalk.grey(`${item.text}(${item.count})`)).join(", ");
+}
+
+const getSpendingDescription = (spending: ISpending) => spending.text + ' ' +  getJoinedTags(spending.tags);
+const getTodoDescription = (todo: ITodo) => `[${todo.finished ? 'x' : ' '}] ` +todo.text + ' ' +  getJoinedTags(todo.tags);
+
+const getParagraph = (paragraph: string) => {
+	if(!paragraph) return "";
+
+	const CUT_OFF = 80;
+	paragraph = paragraph.replace('\n', ' ');
+	if(paragraph.length > CUT_OFF) paragraph = paragraph.slice(0, CUT_OFF) + "...";
+	return paragraph;
+}
+
+const getTopicDescription = (topic: ITopic, prefix = "") => {
+	const title = getLine(topic.title, getParagraph(topic.paragraphs[0]), { prefix });
+
+	const spendings = topic.spendings.map(spending => prefix + getSpendingDescription(spending));
+	const todos = topic.todos.map(todo => prefix + getTodoDescription(todo));
+
+	const tags = Object.values(TagType)
+	.map(tagType => ({ tagType, tags: getJoinedTags(topic.tags.filter(tag => tag.type === tagType)) }))
+	.filter(({ tags }) =>  tags.length)
+	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags, { prefix }))
+
+	return title 
+	+ (tags.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "") 
+	+ tags.join(NEXT_LINE) 
+	+ (spendings.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "") 
+	+ spendings.join(NEXT_LINE) 
+	+ (todos.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "" ) 
+	+ todos.join(NEXT_LINE);
+}
+
+export const getDairyDescription = (dairy: IDairy) => {
+	const filename =  getLine("Filename", dairy.filename, { content: chalk.green });
+
+	const allTags = getUniqueTags(dairy.topics.reduce((tags, topic) => [...tags, ...topic.tags], []));
+
+	const tags = Object.values(TagType)
+	.map(tagType => ({ tagType, tags: getJoinedTags(allTags.filter(tag => tag.type === tagType)) }))
+	.filter(({ tags }) =>  tags.length)
+	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
+
+	const topics = dairy.topics.map(topic => getTopicDescription(topic, PREFIX)).join(NEXT_LINE + NEXT_LINE);
+
+	const description = filename  + NEXT_LINE + tags.join(NEXT_LINE) + NEXT_LINE + NEXT_LINE + topics;
+	return description;
+}
