@@ -35,7 +35,7 @@ const getJoinedTags = (tags: ITag[]) => {
 }
 
 const getSpendingDescription = (spending: ISpending) => spending.text + ' ' +  getJoinedTags(spending.tags);
-const getTodoDescription = (todo: ITodo) => `[${todo.finished ? 'x' : ' '}] ` +todo.text + ' ' +  getJoinedTags(todo.tags);
+const getTodoDescription = (todo: ITodo) => `[${todo.finished ? 'x' : ' '}] ` + (todo.declined ? chalk.strikethrough(todo.text) : todo.text) + ' ' +  getJoinedTags(todo.tags);
 
 const getParagraph = (paragraph: string) => {
 	if(!paragraph) return "";
