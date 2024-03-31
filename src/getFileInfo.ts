@@ -3,6 +3,7 @@ import path from "path";
 
 interface IFileInfo { 
 	date: Date;
+	filename: string;
 	fileContent: string;
 }
 
@@ -22,7 +23,7 @@ export const getFileInfo = async (fileFullpath: string): Promise<IFileInfo> => {
 	return new Promise<IFileInfo>((resolve, reject) => {
 		fs.readFile(fileFullpath, { encoding: "utf-8" }, (err, fileContent) => {
 			if(err) return reject(err);
-			resolve({ date, fileContent });
+			resolve({ date, fileContent, filename: parsedPath.base });
 		});
 	});
 }
