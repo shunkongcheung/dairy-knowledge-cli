@@ -11,7 +11,7 @@ Use a H1 Heading to start a topic. All paragrah should be inside a topic.
 
 Use an empty link to create a tag. Different type of starter indicate various tag
 1. `&` for location: `[&Home]()`
-2. `@` for a contact:‵[@Wife]()‵
+2. `@` for a contact: `[@Wife]()`
 3. `#` for a general tag：`[#Icee cream]()`
 
 Use regular todo to create a todo list.
