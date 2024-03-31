@@ -5,6 +5,7 @@ export enum TagType {
 }
 
 export interface ITag {
+	count: number;
 	text: string;
 	type: TagType;
 }
