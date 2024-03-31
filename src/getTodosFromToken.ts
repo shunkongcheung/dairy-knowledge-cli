@@ -3,6 +3,10 @@ import { getTagsFromToken } from "./getTagsFromToken";
 import { ITodo } from "./types";
 import { getIsList } from "./utils";
 
+
+const CUTOUT_INDICATOR = "~~";
+const CUTOFF_REGEX = new RegExp(CUTOUT_INDICATOR, "g");
+
 export const getTodosFromToken = (token: Token): ITodo[] => {
 	const isList = getIsList(token);
 
@@ -16,11 +20,18 @@ export const getTodosFromToken = (token: Token): ITodo[] => {
 
 	const todoItems = token.items.filter(item => item.task)
 
-	const todos: ITodo[] = todoItems.map(todoItem => ({
+	const todos: ITodo[] = todoItems.map(todoItem => {
+		let text = todoItem.text;
+		const isDeclined = text.startsWith(CUTOUT_INDICATOR) && text.endsWith(CUTOUT_INDICATOR);
+		if(isDeclined) text = text.replace(CUTOFF_REGEX, "");
+
+		return {
+		declined: isDeclined,
 		finished: todoItem.checked,
-		text: todoItem.text,
+		text,
 		tags: getTagsFromToken(todoItem)
-	}));
+	}
+	});
 
 	return todos;
 }
