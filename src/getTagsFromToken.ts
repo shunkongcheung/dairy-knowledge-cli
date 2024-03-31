@@ -1,6 +1,6 @@
 import { Token } from "marked";
 import { ITag, TagType } from "./types";
-import { getIsLink, getIsList, getIsSameTag } from "./utils";
+import { getIsLink, getIsList, getUniqueTags } from "./utils";
 
 const getTagsByType = (token: Token, tagType: TagType): ITag[] => {
 	const isLink = getIsLink(token);
@@ -16,16 +16,6 @@ const getTagsByType = (token: Token, tagType: TagType): ITag[] => {
 	return isTag ? [{ type: tagType, text: token.text  }] : [];
 }
 
-const getUniqueTags = (tags: ITag[]) => {
-	const uniqueTags: ITag[] = [];
-
-	tags.forEach(tag => {
-		const isExist = uniqueTags.find(uniqueTag => getIsSameTag(tag, uniqueTag));
-		if(!isExist) uniqueTags.push(tag);
-	});
-
-	return uniqueTags;
-}
 
 export const getTagsFromToken = (token: Token):ITag[]  => getUniqueTags(
 	Object.values(TagType).reduce((prev, tagType) => [...prev, ...getTagsByType(token, tagType)], [] as ITag[])
