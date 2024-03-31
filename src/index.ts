@@ -2,6 +2,7 @@ import { program } from "commander";
 import { getDairyDescription } from "./getDairyDescription";
 import { getFileInfos } from "./getFileInfos";
 import { getTopics } from "./getTopics";
+import { ITopic } from "./types";
 
 interface IOptions {
 	tags: string;
@@ -40,19 +41,34 @@ const getOptionResult = (options: IOptions) => {
 		const result = getOptionResult(options);
 
 		fileInfos
+			.filter(({ date }) => {
+				const isAfterFromDate = !result.fromDate  ||  date >= result.fromDate;
+				const isBeforeFromDate = !result.endDate  ||  date <= result.endDate;
+				return isAfterFromDate && isBeforeFromDate;
+			})
 			.map(({ filename, fileContent}) => {
-				let topics = [];
+				let topics: ITopic[] = [];
 				try {
 					topics = getTopics(fileContent);
 				}catch (err) {
 					console.log(`Below error happens at: ${filename}`);
 					throw Error(err);
 				}
-				return getDairyDescription({ filename:filename, topics })
+				return { filename, topics };
 			})
+			.filter(({ topics }) => 
+				result.topics.length === 0 || result.topics
+				.map(resultTopic => resultTopic.toLowerCase())
+				.some(resultTopic => topics.some(topic => topic.title.toLowerCase().includes(resultTopic)))
+			)
+			.filter(({ topics }) => {
+				const allTags = topics.reduce((tags, topic) => [...tags, ...topic.tags], []);
+				return result.tags.length === 0 || result.tags
+				.map(resultTag => resultTag.toLowerCase())
+				.some(resultTag => allTags.some(tag => tag.text.toLowerCase().includes(resultTag)))
+			})
+			.map(getDairyDescription)
 			.forEach(description => console.log(description + '\n'));
-
-			console.log(result);
 	});
 
 	program.parse();
