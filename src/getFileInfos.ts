@@ -7,7 +7,7 @@ interface IFileInfo {
 	fileContent: string;
 }
 
-export const getFileInfo = async (fileFullpath: string): Promise<IFileInfo> => {
+const getFileInfo = async (fileFullpath: string): Promise<IFileInfo> => {
   const isExist = fs.existsSync(fileFullpath);
   if(!isExist) throw Error("File does not exist.");
     
@@ -28,4 +28,21 @@ export const getFileInfo = async (fileFullpath: string): Promise<IFileInfo> => {
 	});
 }
 
+export const getFileInfos = async (fileFullpath: string): Promise<IFileInfo[]> => {
+		const isDirectory = fs.lstatSync(fileFullpath).isDirectory();
+		if(!isDirectory) return [await getFileInfo(fileFullpath)];
 
+		const filenames = fs.readdirSync(fileFullpath);
+		filenames.sort();
+
+		const results = await Promise.all(filenames.map(async filename => {
+			try {
+				const fullpath = path.join(fileFullpath, filename);
+				return await getFileInfo(fullpath);
+			}catch {
+				return null;
+			}
+		}));
+
+		return results.filter(item => item !== null);
+}
