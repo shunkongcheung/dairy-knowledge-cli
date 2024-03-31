@@ -15,23 +15,17 @@ const TagNames: Record<TagType, string> = {
 
 interface ILineProps {
 	content: chalk.Chalk;
-	isNextLine: boolean;
-	prefix?: string;
 	title: chalk.Chalk;
 }
 
-const PREFIX =  '\t';
-const NEXT_LINE = '\n';
-const LINE_SEPARATOR = '-------------------\n';
+type Result = string | Result[];
 
 const getLine = (title: string, content: string, props?: Partial<ILineProps>) => {
 	const defaultRender = (...text: unknown[]) => text.join();
 	const contentRender = props?.content || defaultRender;
 	const titleRender  = props?.title || chalk.bold;
-	const isNextLine = props?.isNextLine || false;
-	const prefix = props?.prefix || "";
 
-	return `${prefix}${titleRender(title)}: ${isNextLine? NEXT_LINE: ""}${contentRender(content)}`;
+	return `${titleRender(title)}: ${contentRender(content)}`;
 }
 
 
@@ -52,27 +46,30 @@ const getParagraph = (paragraph: string) => {
 	return paragraph;
 }
 
-const getTopicDescription = (topic: ITopic, prefix = "") => {
-	const title = getLine(topic.title, getParagraph(topic.paragraphs[0]), { prefix });
+const getTopicDescription = (topic: ITopic) => {
+	const title = getLine(topic.title, getParagraph(topic.paragraphs[0]));
 
-	const spendings = topic.spendings.map(spending => prefix + getSpendingDescription(spending));
-	const todos = topic.todos.map(todo => prefix + getTodoDescription(todo));
+	const spendings = topic.spendings.map(spending => getSpendingDescription(spending));
+	const todos = topic.todos.map(todo => getTodoDescription(todo));
 
 	const tags = Object.values(TagType)
 	.map(tagType => ({ tagType, tags: getJoinedTags(topic.tags.filter(tag => tag.type === tagType)) }))
 	.filter(({ tags }) =>  tags.length)
-	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags, { prefix }))
+	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
 
-	return title 
-	+ (tags.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "") 
-	+ tags.join(NEXT_LINE) 
-	+ (spendings.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "") 
-	+ spendings.join(NEXT_LINE) 
-	+ (todos.length > 0 ? NEXT_LINE + prefix + LINE_SEPARATOR : "" ) 
-	+ todos.join(NEXT_LINE);
+	const LINE_SEPARATOR = '-------------------';
+	return [
+		title,
+		...tags,
+		(tags.length > 0 ?  LINE_SEPARATOR : ""),
+		...spendings, 
+		(spendings.length > 0 ?  LINE_SEPARATOR : ""),
+		...todos,
+		(todos.length > 0 ?  LINE_SEPARATOR : ""),
+	].filter(item => !!item);
 }
 
-export const getDairyDescription = (dairy: IDairy) => {
+export const getDairyDescription = (dairy: IDairy): Result[] => {
 	const filename =  getLine("Filename", dairy.filename, { content: chalk.green });
 
 	const allTags = getUniqueTags(dairy.topics.reduce((tags, topic) => [...tags, ...topic.tags], []));
@@ -82,8 +79,24 @@ export const getDairyDescription = (dairy: IDairy) => {
 	.filter(({ tags }) =>  tags.length)
 	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
 
-	const topics = dairy.topics.map(topic => getTopicDescription(topic, PREFIX)).join(NEXT_LINE + NEXT_LINE);
+	const topics = dairy.topics.map(topic => getTopicDescription(topic));
 
-	const description = filename  + NEXT_LINE + tags.join(NEXT_LINE) + NEXT_LINE + NEXT_LINE + topics;
-	return description;
+	return [
+		filename,
+		...tags,
+		topics,
+	];
+}
+
+export const printDescription = (description: Result[]) => {
+	description.forEach(content => {
+		if(Array.isArray(content)) {
+			console.group();
+			printDescription(content);
+			console.groupEnd();
+			if(content.filter(Boolean).length) console.log();
+		} else {
+			console.log(content);
+		}
+	});
 }

@@ -1,5 +1,5 @@
 import { program } from "commander";
-import { getDairyDescription } from "./getDairyDescription";
+import { getDairyDescription, printDescription } from "./getDairyDescription";
 import { getFileInfos } from "./getFileInfos";
 import { getTopics } from "./getTopics";
 import { ITopic } from "./types";
@@ -68,7 +68,7 @@ const getOptionResult = (options: IOptions) => {
 				.some(resultTag => allTags.some(tag => tag.text.toLowerCase().includes(resultTag)))
 			})
 			.map(getDairyDescription)
-			.forEach(description => console.log(description + '\n'));
+			.forEach(printDescription);
 	});
 
 	program.parse();
