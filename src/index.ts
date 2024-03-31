@@ -1,12 +1,23 @@
 import { program } from "commander";
-import { getFileInfo } from "./getFileInfo";
+import { getDairyDescription } from "./getDairyDescription";
+import { getFileInfos } from "./getFileInfos";
 import { getTopics } from "./getTopics";
-import { ITopic } from "./types";
 
-interface IDairy {
-	date: Date;
-	topics: ITopic[];
+interface IOptions {
+	tags: string;
+	topics: string;
+	fromDate: Date | null;
+	endDate: Date | null;
 }
+const getOptionResult = (options: IOptions) => {
+	const tags = options.tags ? options.tags.split(",") : [];
+	const topics = options.topics ? options.topics.split(",") : [];
+	const fromDate = options.fromDate ? new Date(options.fromDate) : null;
+	const endDate = options.endDate ? new Date(options.endDate) : null;
+
+	return { tags, topics, fromDate, endDate  }
+}
+
 
 (async () => {
 
@@ -16,17 +27,34 @@ interface IDairy {
 	.version("1.0.0");
 
 	program
-		.command("check")
-		.description("check one file to see if it comply with the rules of this application")
-		.argument("<filename>", "full file name")
-		.action(async fileFullpath => {
-			const { date, fileContent } = await getFileInfo(fileFullpath);
+	.command("check")
+	.description("check file(s) to see if it comply with the rules of this application")
+	.argument("<filename>", "full file name. Or a directory name.")
+	.option("-a --tags <tags>", "Filter by topics")
+	.option("-e --endDate <endDate>", "End date")
+	.option("-f --fromDate <fromDate>", "From date")
+	.option("-o --topics <topics>", "Filter by topics")
+	.action(async (filename: string, options: IOptions) => {
+		const fileInfos = await getFileInfos(filename);
 
-			const dairy: IDairy = { date, topics: getTopics(fileContent) }
-			
-			console.log(JSON.stringify(dairy, null, 4));
-		});
+		const result = getOptionResult(options);
 
-		program.parse();
+		fileInfos
+			.map(({ filename, fileContent}) => {
+				let topics = [];
+				try {
+					topics = getTopics(fileContent);
+				}catch (err) {
+					console.log(`Below error happens at: ${filename}`);
+					throw Error(err);
+				}
+				return getDairyDescription({ filename:filename, topics })
+			})
+			.forEach(description => console.log(description + '\n'));
+
+			console.log(result);
+	});
+
+	program.parse();
 
 })();
