@@ -47,7 +47,7 @@ const getParagraph = (paragraph: string) => {
 }
 
 const getTopicDescription = (topic: ITopic) => {
-	const title = getLine(topic.title, getParagraph(topic.paragraphs[0]));
+	const title = getLine(topic.title, getParagraph(topic.paragraphs.join(" ")));
 
 	const spendings = topic.spendings.map(spending => getSpendingDescription(spending));
 	const todos = topic.todos.map(todo => getTodoDescription(todo));
