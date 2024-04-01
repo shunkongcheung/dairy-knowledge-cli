@@ -3,6 +3,7 @@ import { ISpending, ITopic, ITodo, ITag, TagType } from "./types";
 import { getUniqueTags } from "./utils"
 
 interface IDairy {
+	fileFullpath: string;
 	filename: string;
 	topics: ITopic[];
 }
@@ -69,7 +70,7 @@ const getTopicDescription = (topic: ITopic) => {
 }
 
 export const getDairyDescription = (dairy: IDairy): Result[] => {
-	const filename =  getLine("Filename", dairy.filename, { content: chalk.green });
+	const filename =  getLine("Filename", `${dairy.filename} (${dairy.fileFullpath})`, { content: chalk.green });
 
 	const allTags = getUniqueTags(dairy.topics.reduce((tags, topic) => [...tags, ...topic.tags], []));
 
