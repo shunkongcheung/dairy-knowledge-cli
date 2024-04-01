@@ -64,7 +64,7 @@ const getTopicDescription = (topic: ITopic) => {
 		...tags,
 		(tags.length > 0 ?  LINE_SEPARATOR : ""),
 		...spendings, 
-		(todos.length > 0 ?  LINE_SEPARATOR : ""),
+		(spendings.length > 0 ?  LINE_SEPARATOR : ""),
 		...todos,
 	].filter(item => !!item);
 }
