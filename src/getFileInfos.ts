@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-interface IFileInfo { 
+export interface IFileInfo { 
 	date: Date;
 	filename: string;
 	fileFullpath: string;

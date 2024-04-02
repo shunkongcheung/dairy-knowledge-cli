@@ -1,4 +1,6 @@
 import { program } from "commander";
+import { appendOptions, getOptionResult } from "./getOptionResult";
+import { getDairiesFromOptions } from "./getDairiesFromOptions";
 import { check } from "./check";
 
 
@@ -9,15 +11,17 @@ import { check } from "./check";
 	.description("A CLI to help me understand my schedule, spending, and more")
 	.version("1.0.0");
 
-	program
+	const command = program
 	.command("check")
 	.description("check file(s) to see if it comply with the rules of this application")
 	.argument("<filename>", "full file name. Or a directory name.")
-	.option("-a --tags <tags>", "Filter by topics")
-	.option("-e --endDate <endDate>", "End date")
-	.option("-f --fromDate <fromDate>", "From date")
-	.option("-o --topics <topics>", "Filter by topics")
-	.action(check);
+
+	appendOptions(command).action(async (filename, options) => {
+		const result = getOptionResult(options)
+		const dairies = await getDairiesFromOptions(filename, result)
+		check(dairies, result);
+	});
+	
 
 	program.parse();
 

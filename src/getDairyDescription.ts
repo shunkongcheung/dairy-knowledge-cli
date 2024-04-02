@@ -1,94 +1,75 @@
-// import chalk from "chalk";
-// import { ISpending, ITopic, ITodo, ITag, TagType } from "./types";
-// import { getUniqueTags } from "./utils"
+import chalk from "chalk";
+import { ITopic, ITag, TagType } from "./types";
 
-// interface IDairy {
-// 	fileFullpath: string;
-// 	filename: string;
-// 	topics: ITopic[];
-// }
+export interface IDairy {
+	fileFullpath: string;
+	filename: string;
+	topics: ITopic[];
+}
 
-// const TagNames: Record<TagType, string> = {
-// 	[TagType.Contact]:  "Contact",
-// 	[TagType.Place]:  "Location",
-// 	[TagType.General]:  "Other",
-// }
+const TagNames: Record<TagType, string> = {
+	[TagType.Contact]:  "Contact",
+	[TagType.Place]:  "Location",
+	[TagType.General]:  "Other",
+}
 
-export const getDairyDescription = () => ["hello world"];
-
-// interface ILineProps {
-// 	content: chalk.Chalk;
-// 	title: chalk.Chalk;
-// }
+interface ILineProps {
+	content: chalk.Chalk;
+	title: chalk.Chalk;
+}
 
 type Result = string | Result[];
 
-// const getLine = (title: string, content: string, props?: Partial<ILineProps>) => {
-// 	const defaultRender = (...text: unknown[]) => text.join();
-// 	const contentRender = props?.content || defaultRender;
-// 	const titleRender  = props?.title || chalk.bold;
+const getLine = (title: string, content: string, props?: Partial<ILineProps>) => {
+	const defaultRender = (...text: unknown[]) => text.join();
+	const contentRender = props?.content || defaultRender;
+	const titleRender  = props?.title || chalk.bold;
 
-// 	return `${titleRender(title)}: ${contentRender(content)}`;
-// }
+	return `${titleRender(title)}: ${contentRender(content)}`;
+}
 
 
-// const getJoinedTags = (tags: ITag[]) => {
-// 	const descending = (a: ITag, b: ITag) => b.count - a.count;
-// 	return [...tags].sort(descending).map(item => chalk.grey(`${item.text}(${item.count})`)).join(", ");
-// }
+const getJoinedTags = (tags: ITag[]) => {
+	const descending = (a: ITag, b: ITag) => b.count - a.count;
+	return [...tags].sort(descending).map(item => chalk.grey(`${item.text}(${item.count})`)).join(", ");
+}
 
-// const getSpendingDescription = (spending: ISpending) => spending.text + ' ' +  getJoinedTags(spending.tags);
-// const getTodoDescription = (todo: ITodo) => `[${todo.finished ? 'x' : ' '}] ` + (todo.declined ? chalk.strikethrough(todo.text) : todo.text) + ' ' +  getJoinedTags(todo.tags);
+const getPrettifyTag = (text: string) =>  text.replace(/(?:__|[*#])|\[(.*?)\]\(.*?\)/gm, chalk.underline.blueBright('$1'));
+const getPrettyStrikethrough = (text: string) => text.replace(/~~(.*?)~~/g, chalk.strikethrough.blackBright('$1'))
 
-// const getParagraph = (paragraph: string) => {
-// 	if(!paragraph) return "";
+const getPrettify = (text: string, isRaw: boolean) => isRaw ? text : getPrettyStrikethrough(getPrettifyTag(text));
 
-// 	const CUT_OFF = 80;
-// 	paragraph = paragraph.replace('\n', ' ');
-// 	if(paragraph.length > CUT_OFF) paragraph = paragraph.slice(0, CUT_OFF) + "...";
-// 	return paragraph;
-// }
+const getTopicDescription = (topic: ITopic, isRaw: boolean) => {
+	const title = topic.title;
+	const allTags = topic.sections.reduce((tags, section) => [...tags, ...section.tags], [] as ITag[]);
 
-// const getTopicDescription = (topic: ITopic) => {
-// 	const title = getLine(topic.title, getParagraph(topic.paragraphs.join(" ")));
+	const tagsByType = Object.values(TagType)
+		.map(tagType => ({ tagType, tags: getJoinedTags(allTags.filter(tag => tag.type === tagType)) }))
+		.filter(({ tags }) =>  tags.length)
+		.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
 
-// 	const spendings = topic.spendings.map(spending => getSpendingDescription(spending));
-// 	const todos = topic.todos.map(todo => getTodoDescription(todo));
+	const LINE_SEPARATOR = '-------------------';
+	const sections = topic.sections.map(section => section.components.map(component => getPrettify(component.text, isRaw)))
 
-// 	const tags = Object.values(TagType)
-// 	.map(tagType => ({ tagType, tags: getJoinedTags(topic.tags.filter(tag => tag.type === tagType)) }))
-// 	.filter(({ tags }) =>  tags.length)
-// 	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
+	return [
+		title,
+		...tagsByType,
+		(tagsByType.length > 0 ?  LINE_SEPARATOR : ""),
+		...sections,
+	].filter(item => !!item);
+}
 
-// 	const LINE_SEPARATOR = '-------------------';
-// 	return [
-// 		title,
-// 		...tags,
-// 		(tags.length > 0 ?  LINE_SEPARATOR : ""),
-// 		...spendings, 
-// 		(spendings.length > 0 ?  LINE_SEPARATOR : ""),
-// 		...todos,
-// 	].filter(item => !!item);
-// }
 
-// export const getDairyDescription = (dairy: IDairy): Result[] => {
-// 	const filename =  getLine("Filename", `${dairy.filename} (${dairy.fileFullpath})`, { content: chalk.green });
+export const getDairyDescription = (isRaw: boolean) => (dairy: IDairy): Result[] => {
+	const filename =  getLine("Filename", `${dairy.filename} (${dairy.fileFullpath})`, { content: chalk.green });
 
-// 	const allTags = getUniqueTags(dairy.topics.reduce((tags, topic) => [...tags, ...topic.tags], []));
+	const topics = dairy.topics.map(topic => getTopicDescription(topic, isRaw));
 
-// 	const tags = Object.values(TagType)
-// 	.map(tagType => ({ tagType, tags: getJoinedTags(allTags.filter(tag => tag.type === tagType)) }))
-// 	.filter(({ tags }) =>  tags.length)
-// 	.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
-
-// 	const topics = dairy.topics.map(topic => getTopicDescription(topic));
-
-// 	return [
-// 		filename,
-// 		...tags,
-// 		topics,
-// 	];
-// }
+	return [
+		filename,
+		...topics,
+	];
+}
 
 export const printDescription = (description: Result[]) => {
 	description.forEach(content => {

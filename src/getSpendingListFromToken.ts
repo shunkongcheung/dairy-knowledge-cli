@@ -1,5 +1,5 @@
 import { Token } from "marked";
-import { getTagsFromToken } from "./getTagsFromToken";
+import { getBaseComponentFromToken } from "./getBaseComponentFromToken";
 import { ISpending, ISpendingList } from "./types";
 import { getIsList } from "./utils";
 
@@ -22,10 +22,9 @@ export const getSpendingListFromToken = (token: Token): ISpendingList => {
 	const spendings: ISpending[] = spendingItems.map(amountItem => ({
 		amount: getSpendingAmount(amountItem.text),
 		text: amountItem.text,
-		tags: getTagsFromToken(amountItem)
 	}));
 
-	return { items: spendings, tags: getTagsFromToken(token) };
+	return { ...getBaseComponentFromToken(token), items: spendings };
 }
 
 

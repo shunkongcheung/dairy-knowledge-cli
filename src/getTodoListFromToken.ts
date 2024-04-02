@@ -1,5 +1,5 @@
 import { Token } from "marked";
-import { getTagsFromToken } from "./getTagsFromToken";
+import { getBaseComponentFromToken } from "./getBaseComponentFromToken";
 import { ITodo, ITodoList } from "./types";
 import { getIsList } from "./utils";
 
@@ -20,10 +20,10 @@ export const getTodoListFromToken = (token: Token): ITodoList => {
 		const isDeclined = text.startsWith(CUTOUT_INDICATOR) && text.endsWith(CUTOUT_INDICATOR);
 		if(isDeclined) text = text.replace(CUTOFF_REGEX, "");
 
-		return { declined: isDeclined,finished: todoItem.checked, text }
+		return { declined: isDeclined, finished: todoItem.checked, text }
 	});
 
-	return { items: todos, tags: getTagsFromToken(token) };
+	return { ...getBaseComponentFromToken(token), items: todos  };
 }
 
 

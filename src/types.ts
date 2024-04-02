@@ -10,10 +10,6 @@ export interface ITag {
 	type: TagType;
 }
 
-export interface IWithTags {
-	tags: ITag[];
-}
-
 export interface ISpending {
 	amount: number;
 	text: string;
@@ -25,24 +21,26 @@ export interface ITodo {
 	text: string;
 }
 
-interface IList<T> extends IWithTags{
+interface IBaseComponent {
+	text: string;
+}
+
+interface IList<T> extends IBaseComponent{
 	items: T[]
 }
 
 export type ISpendingList = IList<ISpending>;
 export type ITodoList = IList<ITodo>;
 
-interface IParagraph extends IWithTags {
-	text: string;
-}
 
-export type IComponent = ISpendingList | ITodoList | IParagraph;
+export type IComponent = ISpendingList | ITodoList | IBaseComponent;
 
-export interface ISection extends IWithTags{
+export interface ISection {
 	components: IComponent[];
+	tags: ITag[];
 }
 
-export interface ITopic extends IWithTags{
+export interface ITopic {
 	sections: ISection[];
 	title: string;
 }
