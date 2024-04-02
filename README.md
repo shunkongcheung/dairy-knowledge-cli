@@ -43,15 +43,24 @@ something else ....
 ```
 
 # Command
-* `daily-cli show <filepath>`: to list dairy under filepath 
-* `daily-cli tags <filepath> <command: list/combine/rename>`: tag manuplation
+* `daily-cli show <filepath>`: to list dairy under filepath
+* `daily-cli tags <filepath> <command: list/combine>`: tag manuplation
 * `dailry-list spending <filepath> <csv-filepath>`: output spending into a csv
-
-# Options
+* 
+## Common options
 * `-a --tags=<tags[]>`: string array, filter by tags
 * `-e -endDate=<endDate>`: string, yyyy-mm-dd
 * `-f --fromDate=<fromDate>`: string, yyyy-mm-dd
 * `-o --topics=<topic[]>`: string array, filter by topics
 * `-r --isRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
 * `-s --isSpendingListOnly`: If set, show sections with spending only
-* `-t --isTodoListOnly`: If set, show sections with todo's only (available only in `show`
+
+## options (show only)
+* `-t --isTodoListOnly`: If set, show sections with todo's only
+
+## options (tag list only)
+`-B --sortBy <text/count>`: Sort by text order or sort by count
+`-d --orderBy <text/count>`: Sort by text order or sort by count
+
+## argument (tag combine only)
+`<...combine_tags> <combine_into_tags>`: A list of text as argument. The last one in the list would be the combine tag
