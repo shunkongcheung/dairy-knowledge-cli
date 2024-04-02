@@ -2,7 +2,6 @@ import { Command } from "commander";
 
 export interface IOptions {
 	isSpendingOnly: boolean;
-	isRaw: boolean;
 	isTodoOnly: boolean;
 	tags: string[];
 	topics: string[];
@@ -12,11 +11,11 @@ export interface IOptions {
 
 export const appendOptions = (command: Command) => {
 	command
+	.argument("<filename>", "full file name. Or a directory name.")
 	.option("-a --tags <tags>", "Filter by topics")
 	.option("-e --endDate <endDate>", "End date")
 	.option("-f --fromDate <fromDate>", "From date")
 	.option("-o --topics <topics>", "Filter by topics")
-	.option("-r --isRaw", "Print content as waw markdown format")
 	.option("-s --isSpendingOnly", "Print dairy with todo list only")
 	.option("-t --isTodoOnly", "Print dairy with spending list only")
 
@@ -30,10 +29,9 @@ export const getOptionResult = (options: { [x: string]: string }): IOptions => {
 	const endDate = options.endDate ? new Date(options.endDate) : null;
 
 	const isSpendingOnly = !!options.isSpendingOnly;
-	const isRaw = !!options.isRaw;
 	const isTodoOnly = !!options.isTodoOnly;
 
-	return { isSpendingOnly, isRaw, isTodoOnly, tags, topics, fromDate, endDate  }
+	return { isSpendingOnly, isTodoOnly, tags, topics, fromDate, endDate  }
 }
 
 

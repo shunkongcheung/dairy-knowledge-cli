@@ -12,14 +12,17 @@ import { check } from "./check";
 	.version("1.0.0");
 
 	const command = program
-	.command("check")
-	.description("check file(s) to see if it comply with the rules of this application")
-	.argument("<filename>", "full file name. Or a directory name.")
+	.command("show")
+	.description("Show file content")
 
-	appendOptions(command).action(async (filename, options) => {
+	appendOptions(command)
+	.option("-r --isRaw", "Print content as waw markdown format")
+	.action(async (filename, options) => {
 		const result = getOptionResult(options)
 		const dairies = await getDairiesFromOptions(filename, result)
-		check(dairies, result);
+
+		const isRaw = !!options.isRaw;
+		check(dairies, { isRaw });
 	});
 	
 
