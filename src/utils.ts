@@ -2,7 +2,6 @@ import { Token, Tokens } from "marked";
 import { ITag } from "./types";
 
 export const getIsList = (token: Token): token is Tokens.List => token.type === "list";
-export const getIsLink = (token: Token): token is Tokens.Link => token.type === "link";
 
 export const getUniqueTags = (tags: ITag[]) => {
 	const uniqueTags: ITag[] = [];

@@ -1,6 +1,8 @@
-import { Token } from "marked";
+import { Token, Tokens } from "marked";
 import { ITag, TagType } from "./types";
-import { getIsLink, getIsList, getUniqueTags } from "./utils";
+import { getIsList, getUniqueTags } from "./utils";
+
+const getIsLink = (token: Token): token is Tokens.Link => token.type === "link";
 
 const getTagType = (text: string) => {
 	const tagTypes = Object.values(TagType);
