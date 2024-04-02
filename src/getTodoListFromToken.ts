@@ -1,39 +1,29 @@
 import { Token } from "marked";
 import { getTagsFromToken } from "./getTagsFromToken";
-import { ITodo } from "./types";
+import { ITodo, ITodoList } from "./types";
 import { getIsList } from "./utils";
 
 
 const CUTOUT_INDICATOR = "~~";
 const CUTOFF_REGEX = new RegExp(CUTOUT_INDICATOR, "g");
 
-export const getTodosFromToken = (token: Token): ITodo[] => {
+export const getTodoListFromToken = (token: Token): ITodoList => {
 	const isList = getIsList(token);
 
-	if(!isList) {
-		return "tokens" in token 
-			? token.tokens.reduce((prev, childToken) => [...prev, ...getTodosFromToken(childToken)], [] as ITodo[])
-			: getIsList(token)
-				? token.items.reduce((prev, childItem) => [...prev, ...getTodosFromToken(childItem)], [] as ITodo[])
-				: [];
-	}
+	if(!isList) return null;
 
 	const todoItems = token.items.filter(item => item.task)
+	if(!todoItems.length || todoItems.length !== token.items.length) return null;
 
 	const todos: ITodo[] = todoItems.map(todoItem => {
 		let text = todoItem.text;
 		const isDeclined = text.startsWith(CUTOUT_INDICATOR) && text.endsWith(CUTOUT_INDICATOR);
 		if(isDeclined) text = text.replace(CUTOFF_REGEX, "");
 
-		return {
-		declined: isDeclined,
-		finished: todoItem.checked,
-		text,
-		tags: getTagsFromToken(todoItem)
-	}
+		return { declined: isDeclined,finished: todoItem.checked, text }
 	});
 
-	return todos;
+	return { items: todos, tags: getTagsFromToken(token) };
 }
 
 
