@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { IDairy } from "./getDairiesFromOptions";
 import { ITopic, ITag, TagType } from "./types";
+import { getUniqueTags } from "./utils";
 
 const TagNames: Record<TagType, string> = {
 	[TagType.Contact]:  "Contact",
@@ -39,7 +40,7 @@ const getTopicDescription = (topic: ITopic, isRaw: boolean) => {
 	const allTags = topic.sections.reduce((tags, section) => [...tags, ...section.tags], [] as ITag[]);
 
 	const tagsByType = Object.values(TagType)
-		.map(tagType => ({ tagType, tags: getJoinedTags(allTags.filter(tag => tag.type === tagType)) }))
+		.map(tagType => ({ tagType, tags: getJoinedTags(getUniqueTags(allTags.filter(tag => tag.type === tagType))) }))
 		.filter(({ tags }) =>  tags.length)
 		.map(({ tagType, tags }) => getLine(TagNames[tagType], tags))
 
