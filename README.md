@@ -48,11 +48,10 @@ something else ....
 * `dailry-list spending <filepath> <csv-filepath>`: output spending into a csv
 
 # Options
-* `--topics=<topic[]>`: string array, filter by topics
-* `--tags=<tags[]>`: string array, filter by tags
-* `--fromDate=<fromDate>`: string, yyyy-mm-dd
-* `-toDate=<toDate>`: string, yyyy-mm-dd
-* `-toDate=<toDate>`: string, yyyy-mm-dd
-* `--showRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
-* `--todo=<pendingOnly>`: If set, show sections with todo's only
-* `--spending`: If set, show sections with spending only
+* `-a --tags=<tags[]>`: string array, filter by tags
+* `-e -endDate=<endDate>`: string, yyyy-mm-dd
+* `-f --fromDate=<fromDate>`: string, yyyy-mm-dd
+* `-o --topics=<topic[]>`: string array, filter by topics
+* `-r --isRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
+* `-s --isSpendingListOnly`: If set, show sections with spending only
+* `-t --isTodoListOnly`: If set, show sections with todo's only
