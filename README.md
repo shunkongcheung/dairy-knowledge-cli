@@ -54,4 +54,4 @@ something else ....
 * `-o --topics=<topic[]>`: string array, filter by topics
 * `-r --isRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
 * `-s --isSpendingListOnly`: If set, show sections with spending only
-* `-t --isTodoListOnly`: If set, show sections with todo's only
+* `-t --isTodoListOnly`: If set, show sections with todo's only (available only in `show`
