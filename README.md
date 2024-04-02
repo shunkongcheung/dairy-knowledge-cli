@@ -60,7 +60,7 @@ something else ....
 
 ## options (tag list only)
 * `-B --sortBy <text/count>`: Sort by text order or sort by count
-* `-d --orderBy <text/count>`: Sort by text order or sort by count
+* `-d --orderBy <a/d>`: Sort ascending or descending
 
 ## argument (tag combine only)
 * `<...combine_tags> <combine_into_tags>`: A list of text as argument. The last one in the list would be the combine tag
