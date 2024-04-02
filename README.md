@@ -52,5 +52,7 @@ something else ....
 * `--tags=<tags[]>`: string array, filter by tags
 * `--fromDate=<fromDate>`: string, yyyy-mm-dd
 * `-toDate=<toDate>`: string, yyyy-mm-dd
+* `-toDate=<toDate>`: string, yyyy-mm-dd
+* `--showRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
 * `--todo=<pendingOnly>`: If set, show sections with todo's only
 * `--spending`: If set, show sections with spending only
