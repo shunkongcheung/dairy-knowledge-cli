@@ -17,7 +17,6 @@ const getDairy = ({ filename, fileContent, ...rest }: IFileInfo): IDairy => {
 	try {
 		tokensList = marked.lexer(fileContent);
 		topics = getTopicsFromTokensList(tokensList);
-		console.log(topics)
 	}catch (err) {
 		console.log(`Below error happens at: ${filename}`);
 		throw Error(err);
