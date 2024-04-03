@@ -54,11 +54,11 @@ something else ....
 * `-e -endDate=<endDate>`: string, yyyy-mm-dd
 * `-f --fromDate=<fromDate>`: string, yyyy-mm-dd
 * `-o --topics=<topic[]>`: string array, filter by topics
-* `-r --isRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
 * `-s --isSpendingListOnly`: If set, show sections with spending only
-
-## options (show only)
 * `-t --isTodoListOnly`: If set, show sections with todo's only
+* 
+## options (show only)
+* `-r --isRaw`: Removing styling. text are styled by default. (e.g. cross out, link, etc)
 
 ## options (tag_list only)
 * `-B --sortBy <text/count>`: Sort by text order or sort by count
