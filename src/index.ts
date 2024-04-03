@@ -4,7 +4,6 @@ import { getDairiesFromOptions } from "./getDairiesFromOptions";
 import { combine } from "./combine";
 import { show } from "./show";
 import { list } from "./list";
-import { rename } from "./rename";
 
 
 (async () => {
@@ -14,6 +13,7 @@ import { rename } from "./rename";
 	.description("A CLI to help me understand my schedule, spending, and more")
 	.version("1.0.0");
 
+	// show 
 	const commandShow = program
 	.command("show")
 	.description("Show file content")
@@ -29,23 +29,40 @@ import { rename } from "./rename";
 	});
 	
 
-	const actionDescription =  "Choose from one of the action: list, combine, rename"
-	const commandTags = program
-	.command("tags")
-	.description("Organize tags")
+	// tag list
+	const commandList = program
+	.command("tags_list")
+	.description("List tags")
 
-	appendOptions(commandTags)
-	.argument("<action>", actionDescription)
-	.action(async (filename, action, options) => {
+	appendOptions(commandList)
+	.option("-B --sortBy <sortBy>", "Sort by text order or sort by count")
+	.option("-d --orderBy <orderBy>", "Sort ascending or descending")
+	.action(async (filename, options) => {
 		const result = getOptionResult(options)
 		const dairies = await getDairiesFromOptions(filename, result)
 
-		if(action === "combine") return combine(dairies);
-		if(action === "list") return list(dairies);
-		if(action === "rename") return rename(dairies);
-		
-		throw Error(`Unknown action ${action}. ${actionDescription}.`);
+		const orderBy = options.orderBy === "a" ? "a" : "d";
+		const sortBy = options.sortBy === "text" ? "text" : "count";
+
+		list(dairies, { orderBy, sortBy });
 	});
+
+	// tag list
+	const commandCombine = program
+	.command("tags_combine")
+	.description("Combine tags")
+
+	appendOptions(commandCombine)
+	.argument("<tags...>", "Tags to combine. The last input is used as the result text.")
+	.action(async (filename: string, tags: string[], options) => {
+		if(tags.length < 2) throw Error("At least two tags should be provided");
+
+		const result = getOptionResult(options)
+		const dairies = await getDairiesFromOptions(filename, result)
+
+		await combine(dairies, tags);
+	});
+
 
 	program.parse();
 
