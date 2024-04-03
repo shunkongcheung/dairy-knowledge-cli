@@ -44,7 +44,9 @@ something else ....
 
 # Command
 * `daily-cli show <filepath>`: to list dairy under filepath
-* `daily-cli tags <filepath> <command: list/combine>`: tag manuplation
+* `daily-cli tags_list <filepath>`: list tags that are within the scope
+* `daily-cli tags_suggest <filepath>`: suggest tags that are mergable
+* `daily-cli tags_combine <filepath> <...tags>`: combine tags. last input is used as the merge in value
 * `dailry-list spending <filepath> <csv-filepath>`: output spending into a csv
 * 
 ## Common options
@@ -58,9 +60,9 @@ something else ....
 ## options (show only)
 * `-t --isTodoListOnly`: If set, show sections with todo's only
 
-## options (tag list only)
+## options (tag_list only)
 * `-B --sortBy <text/count>`: Sort by text order or sort by count
 * `-d --orderBy <a/d>`: Sort ascending or descending
 
-## argument (tag combine only)
+## argument (tag_combine only)
 * `<...combine_tags> <combine_into_tags>`: A list of text as argument. The last one in the list would be the combine tag
